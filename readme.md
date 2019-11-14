@@ -1,4 +1,6 @@
-	</center>
+
+
+<p align="center">
 
 | Name | Link |
 |---+---|
@@ -7,5 +9,4 @@
 |Joy|[[http://wiki.ros.org/joy][http://wiki.ros.org/joy]]|
 |ROS Serial|[[http://wiki.ros.org/rosserial][http://wiki.ros.org/rosserial]]|
 
-
-	</center>
+</p>
