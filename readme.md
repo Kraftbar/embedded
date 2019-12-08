@@ -14,5 +14,4 @@
 | or JMT Acrylic Plate Vehical Chassis Frame Self-balanced Mini Two-drive 2 Wheel | 1| 20 |
 |l293d / L293  | 1| 2 |
 |LM2596 DC-DC Buck  | 1| 2 |
-
-
+|raspberry pi  | 1| 35 |
