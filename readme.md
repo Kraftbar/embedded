@@ -15,3 +15,4 @@
 |l293d / L293  | 1| 2 |
 |LM2596 DC-DC Buck  | 1| 2 |
 |raspberry pi  | 1| 35 |
+|LiPo Voltage Checker  | 1| 1 |
