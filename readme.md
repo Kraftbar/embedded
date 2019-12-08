@@ -8,7 +8,7 @@
 |ROS Serial  |[http://wiki.ros.org/rosserial](http://wiki.ros.org/rosserial)|
 |building-a-self-balancing-robot |[/building-a-self-balancing-robot](https://ferrolho.github.io/blog/2018-04-22/building-a-self-balancing-robot) |
 
-| component | quantity | price |
+| item | quantity | price |
 |----------------|----------------|-----------------------|
 |TT Motor Smart Car Robot Gear Motor and Wheel for Arduino | 2| 2 |
 | or JMT Acrylic Plate Vehical Chassis Frame Self-balanced Mini Two-drive 2 Wheel | 1| 20 |
