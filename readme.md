@@ -1,4 +1,5 @@
 ref. lec 3/4 s.21
+<br>
 
 | Name | Link |
 |---------------------------------|----------------------------------------------------------------------------|
@@ -7,6 +8,7 @@ ref. lec 3/4 s.21
 |Joy         |[http://wiki.ros.org/joy](http://wiki.ros.org/joy)|
 |ROS Serial  |[http://wiki.ros.org/rosserial](http://wiki.ros.org/rosserial)|
 |building-a-self-balancing-robot |[/building-a-self-balancing-robot](https://ferrolho.github.io/blog/2018-04-22/building-a-self-balancing-robot) |
+<br>
 
 | item | quantity | price | did buy? |
 |----------------|----------------|-----------------------|-----------------------|
@@ -15,6 +17,9 @@ ref. lec 3/4 s.21
 |raspberry pi  | 1| 35 | 1 |
 |LM2596 DC-DC Buck  | 1| 2 | 0 |
 |LiPo Voltage Checker  | 1| 1 | 0 |
+
+
+<br>
 
 | item | quantity | price | did buy? |
 |----------------|----------------|-----------------------|-----------------------|
