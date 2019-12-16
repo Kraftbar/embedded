@@ -11,7 +11,7 @@
 | item | quantity | price | did buy? |
 |----------------|----------------|-----------------------|-----------------------|
 |TT Motor Smart Car Robot Gear Motor and Wheel for Arduino | 2| 2 | 0 |
-| or JMT Acrylic Plate Vehical Chassis Frame Self-balanced Mini Two-drive 2 Wheel | 1| 20 | 1 |
+| JMT Acrylic Plate Vehical Chassis Frame Self-balanced Mini Two-drive 2 Wheel | 1| 20 | 1 |
 |l293d / L293  | 1| 2 | 0 |
 |LM2596 DC-DC Buck  | 1| 2 | 0 |
 |raspberry pi  | 1| 35 | 1 |
