@@ -19,6 +19,9 @@ ref. lec 3/4 s.21
 |LiPo Voltage Checker  | 1| 1 | 0 |
 
 
+L298N       
+
+
 <br>
 
 | item | quantity | price | did buy? |
