@@ -20,6 +20,7 @@ ref. lec 3/4 s.21
 
 
 L298N       
+mpu6050
 
 
 <br>
