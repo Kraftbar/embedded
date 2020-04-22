@@ -17,6 +17,8 @@ ref. lec 3/4 s.21
 |raspberry pi  | 1| 35 | 1 |
 |LM2596 DC-DC Buck  | 1| 2 | 0 |
 |LiPo Voltage Checker  | 1| 1 | 0 |
+|MPU-6050  | 1| 1 | 1 |
+
 
 
 L298N       
