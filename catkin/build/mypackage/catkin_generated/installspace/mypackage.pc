@@ -1,0 +1,8 @@
+prefix=/home/nybo/catkin/install
+
+Name: mypackage
+Description: Description of mypackage
+Version: 0.9.2
+Cflags: -I${prefix}/include
+Libs: -L${prefix}/lib 
+Requires: message_runtime std_msgs

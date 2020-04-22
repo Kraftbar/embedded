@@ -1,0 +1,8 @@
+prefix=/home/nybo/catkin/devel
+
+Name: motor_man
+Description: Description of motor_man
+Version: 0.0.0
+Cflags: 
+Libs: -L${prefix}/lib 
+Requires: 
