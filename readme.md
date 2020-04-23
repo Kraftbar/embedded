@@ -10,6 +10,7 @@ ref. lec 3/4 s.21
 |building-a-self-balancing-robot |[/building-a-self-balancing-robot](https://ferrolho.github.io/blog/2018-04-22/building-a-self-balancing-robot) |
 |mpu6050 software (not tested) |[ros-mpu6050-node](https://github.com/matpalm/ros-mpu6050-node) |
 |joystick software |[joy_teleop](https://github.com/fsuarez6/labrob/blob/ca1a47f37ed0bdbfef74b4cc7a8963e4a921c143/labrob_control/scripts/joy_teleop.py) |
+|Motor software |[AMSpi](https://github.com/lipoja/AMSpi) |
 
 
 <br>
