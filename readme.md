@@ -9,6 +9,8 @@ ref. lec 3/4 s.21
 |ROS Serial  |[http://wiki.ros.org/rosserial](http://wiki.ros.org/rosserial)|
 |building-a-self-balancing-robot |[/building-a-self-balancing-robot](https://ferrolho.github.io/blog/2018-04-22/building-a-self-balancing-robot) |
 |mpu6050 software |[ros-mpu6050-node](https://github.com/matpalm/ros-mpu6050-node) |
+|joystick software |[ros-mpu6050-node](https://github.com/srikanthmalla/joystick_control) |
+
 
 <br>
 
