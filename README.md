@@ -8,4 +8,5 @@ still need:
 input - long list of 4 lines repeating           
 3. motor driven from usb               
 
-https://blog.mbedded.ninja/programming/operating-systems/linux/linux-serial-ports-using-c-cpp/
+https://blog.mbedded.ninja/programming/operating-systems/linux/linux-serial-ports-using-c-cpp/              
+https://pyserial.readthedocs.io/en/latest/shortintro.html                
