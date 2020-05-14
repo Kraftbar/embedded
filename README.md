@@ -7,3 +7,5 @@ still need:
 1. excel sheet reading        
 input - long list of 4 lines repeating           
 3. motor driven from usb               
+
+https://blog.mbedded.ninja/programming/operating-systems/linux/linux-serial-ports-using-c-cpp/
