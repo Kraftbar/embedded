@@ -1,5 +1,9 @@
 # autoprintLabels
 
+ideas     
+- before running, do  confidence check on the right LLD info is read
+
+
 2. driver:       
 https://github.com/computerlyrik/dymoprint
 
