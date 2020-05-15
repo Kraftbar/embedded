@@ -16,4 +16,5 @@ input - long list of 4 lines repeating
 
 - [linux-serial](https://blog.mbedded.ninja/programming/operating-systems/linux/linux-serial-ports-using-c-cpp/)              
 - [py-serial](https://pyserial.readthedocs.io/en/latest/shortintro.html)                
-- [dc-motor](https://circuitdigest.com/microcontroller-projects/arduino-dc-motor-speed-direction-control)
+- [dc-motor (relay)](https://circuitdigest.com/microcontroller-projects/arduino-dc-motor-speed-direction-control)
+- [dc-motor (transitor)](https://www.arduino.cc/en/Tutorial/TransistorMotorControl)
