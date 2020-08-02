@@ -12,16 +12,27 @@ wiring
   white - TX
 
  */
- 
- 
- 
+  
 #include <SoftwareSerial.h>
 
+
+
 SoftwareSerial mySerial(11, 12); // RX, TX
+
+
+
+
+#define dirPin 2
+#define stepPin 3
+#define stepsPerRevolution 20
 
 void setup()
 {
   pinMode(LED_BUILTIN, OUTPUT);  
+
+  pinMode(stepPin, OUTPUT);
+  pinMode(dirPin, OUTPUT);
+
 
   Serial.begin(9600);
   Serial.println("Goodnight moon!");
@@ -34,13 +45,31 @@ void setup()
 
 char input;
 
-
-void loop() // run over and over
+int toggle=0;
+void loop() 
 {
     if(Serial.available()){
         input = Serial.read();
         Serial.print("You typed: " );
         Serial.println(input);
+    }
+    
+    
+    toggle = !toggle;
+    if(toggle){
+      digitalWrite(dirPin, HIGH);
+    }else{
+      digitalWrite(dirPin, LOW);
+    }
+    delay(1000);
+      
+    // Spin the stepper motor 1 revolution slowly:
+    for (int i = 0; i < stepsPerRevolution; i++) {
+      // These four lines result in 1 step:
+      digitalWrite(stepPin, HIGH);
+      delayMicroseconds(4000);
+      digitalWrite(stepPin, LOW);
+      delayMicroseconds(4000);
     }
  
 
