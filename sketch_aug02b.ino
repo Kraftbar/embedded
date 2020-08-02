@@ -1,53 +1,48 @@
+ 
 /*
-stty -F /dev/ttyS1 raw speed 9600
-while [ 1 ]; do         READ=`dd if=/dev/ttyUSB3 count=1`;         echo $READ; done
 
-cat  > /dev/ttyUSB3
-##wite something###
+WRITE 
+  stty -F /dev/ttyUSB6 raw speed 9600
+  while [ 1 ]; do         READ=`dd if=/dev/ttyUSB6 count=1`;         echo $READ; done
+READ
+  cat  > /dev/ttyUSB6
+
+wiring
+  green - RX
+  white - TX
 
  */
+ 
+ 
+ 
 #include <SoftwareSerial.h>
 
 SoftwareSerial mySerial(11, 12); // RX, TX
 
 void setup()
 {
-        pinMode(LED_BUILTIN, OUTPUT);  
-  // Open serial communications and wait for port to open:
+  pinMode(LED_BUILTIN, OUTPUT);  
+
   Serial.begin(9600);
-  while (!Serial) {
-    ; // wait for serial port to connect. Needed for Native USB only
-  }
-
-
   Serial.println("Goodnight moon!");
 
-  // set the data rate for the SoftwareSerial port
   mySerial.begin(9600);
   mySerial.println("Hello, world?");
 }
 
+
+
+char input;
+
+
 void loop() // run over and over
 {
-  if (mySerial.available())
-    Serial.write(mySerial.read());
-  if (Serial.available())
-    mySerial.write(Serial.read());
-    
-	if (Serial.available() > 0) {
-             Serial.println("serial is  available");
-
-		}
-       else{
-           Serial.println("serial is not available");
-}    
-    
+    if(Serial.available()){
+        input = Serial.read();
+        Serial.print("You typed: " );
+        Serial.println(input);
+    }
  
-    digitalWrite(LED_BUILTIN, HIGH);   // turn the LED on 
-    delay(500);                       // wait for half a second
-    digitalWrite(LED_BUILTIN, LOW);    // turn the LED off 
-    delay(500);     
 
 }
-
 
