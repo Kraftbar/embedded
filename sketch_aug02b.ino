@@ -71,7 +71,13 @@ void loop()
         
 
         
-        if(voltage<2.10 || voltage>3.2){
+        if(voltage>2.10 && voltage<3.2){
+          digitalWrite(stepPin, HIGH);
+          delayMicroseconds(2000);
+          digitalWrite(stepPin, LOW);
+          delayMicroseconds(2000);   
+        }else{
+               // These four lines result in 1 step:
             toggle = !toggle;
             if(toggle){
               digitalWrite(dirPin, HIGH);
@@ -86,6 +92,10 @@ void loop()
           delayMicroseconds(2000);
           digitalWrite(stepPin, LOW);
           delayMicroseconds(2000);
+          digitalWrite(stepPin, HIGH);
+          delayMicroseconds(2000);
+          digitalWrite(stepPin, LOW);
+          delayMicroseconds(2000);
         }
           
         
@@ -93,4 +103,5 @@ void loop()
  
 
 }
+
 
