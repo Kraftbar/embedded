@@ -42,34 +42,53 @@ void setup()
 }
 
 
+int modteller=0;
+
 
 char input;
 
 int toggle=0;
 void loop() 
 {
+  
+  
+    int sensorValue = analogRead(A4);
+    // Convert the analog reading (which goes from 0 - 1023) to a voltage (0 - 5V):
+      float voltage = sensorValue * (5.0 / 1023.0);
+    // print out the value you read:
+    Serial.println(voltage);
+    Serial.println(modteller);
+        
     if(Serial.available()){
         input = Serial.read();
         Serial.print("You typed: " );
         Serial.println(input);
     }
     
-    
-    toggle = !toggle;
-    if(toggle){
-      digitalWrite(dirPin, HIGH);
-    }else{
-      digitalWrite(dirPin, LOW);
-    }
-    delay(1000);
+    modteller = (1 + modteller) % 10;   // modulo operator rolls over variable  
+    if(modteller==0){
       
-    // Spin the stepper motor 1 revolution slowly:
-    for (int i = 0; i < stepsPerRevolution; i++) {
-      // These four lines result in 1 step:
-      digitalWrite(stepPin, HIGH);
-      delayMicroseconds(4000);
-      digitalWrite(stepPin, LOW);
-      delayMicroseconds(4000);
+        
+
+        
+        if(voltage<2.10 || voltage>3.2){
+            toggle = !toggle;
+            if(toggle){
+              digitalWrite(dirPin, HIGH);
+            }else{
+              digitalWrite(dirPin, LOW);
+            }          // These four lines result in 1 step:
+          digitalWrite(stepPin, HIGH);
+          delayMicroseconds(2000);
+          digitalWrite(stepPin, LOW);
+          delayMicroseconds(2000);          // These four lines result in 1 step:
+          digitalWrite(stepPin, HIGH);
+          delayMicroseconds(2000);
+          digitalWrite(stepPin, LOW);
+          delayMicroseconds(2000);
+        }
+          
+        
     }
  
 
