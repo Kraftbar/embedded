@@ -48,6 +48,10 @@ int modteller=0;
 char input;
 
 int toggle=0;
+
+int cutflag=2;
+// send serial signal of char 0 to cut
+
 void loop() 
 {
   
@@ -61,6 +65,9 @@ void loop()
         
     if(Serial.available()){
         input = Serial.read();
+        if(input=='0'){
+        cutflag=0;
+        }
         Serial.print("You typed: " );
         Serial.println(input);
     }
@@ -70,38 +77,40 @@ void loop()
       
         
 
-        
-        if(voltage>2.10 && voltage<3.2){
-          digitalWrite(stepPin, HIGH);
-          delayMicroseconds(2000);
-          digitalWrite(stepPin, LOW);
-          delayMicroseconds(2000);   
-        }else{
-               // These four lines result in 1 step:
-            toggle = !toggle;
-            if(toggle){
-              digitalWrite(dirPin, HIGH);
-            }else{
-              digitalWrite(dirPin, LOW);
-            }          // These four lines result in 1 step:
-          digitalWrite(stepPin, HIGH);
-          delayMicroseconds(2000);
-          digitalWrite(stepPin, LOW);
-          delayMicroseconds(2000);          // These four lines result in 1 step:
-          digitalWrite(stepPin, HIGH);
-          delayMicroseconds(2000);
-          digitalWrite(stepPin, LOW);
-          delayMicroseconds(2000);
-          digitalWrite(stepPin, HIGH);
-          delayMicroseconds(2000);
-          digitalWrite(stepPin, LOW);
-          delayMicroseconds(2000);
-        }
-          
+        if(cutflag<2){
+          if(voltage>2.10 && voltage<2.7 ){
+            digitalWrite(stepPin, HIGH);
+            delayMicroseconds(2000);
+            digitalWrite(stepPin, LOW);
+            delayMicroseconds(2000);   
+          }else{
+                 // These four lines result in 1 step:
+              toggle = !toggle;
+              if(toggle){
+                digitalWrite(dirPin, HIGH);
+              }else{
+                digitalWrite(dirPin, LOW);
+              }          // These four lines result in 1 step:
+            digitalWrite(stepPin, HIGH);
+            delayMicroseconds(2000);
+            digitalWrite(stepPin, LOW);
+            delayMicroseconds(2000);          // These four lines result in 1 step:
+            digitalWrite(stepPin, HIGH);
+            delayMicroseconds(2000);
+            digitalWrite(stepPin, LOW);
+            delayMicroseconds(2000);
+            digitalWrite(stepPin, HIGH);
+            delayMicroseconds(2000);
+            digitalWrite(stepPin, LOW);
+            delayMicroseconds(2000);
+            cutflag++;
+          }
+        } 
         
     }
  
 
 }
+
 
 
