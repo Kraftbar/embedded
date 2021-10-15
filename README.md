@@ -21,3 +21,6 @@ input - long list of 4 lines repeating
 
 
 
+
+!(IMG_1053.jpeg)
+
