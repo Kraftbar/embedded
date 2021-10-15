@@ -20,7 +20,7 @@ input - long list of 4 lines repeating
 
 
 
+![Alt text](IMG_1053.jpeg?raw=true "pic")
 
 
-!(IMG_1053.jpeg)
 
