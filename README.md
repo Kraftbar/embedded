@@ -17,3 +17,7 @@ input - long list of 4 lines repeating
 - [py-serial](https://pyserial.readthedocs.io/en/latest/shortintro.html)                
 - [dc-motor (relay)](https://circuitdigest.com/microcontroller-projects/arduino-dc-motor-speed-direction-control)
 - [dc-motor (transitor)](https://www.arduino.cc/en/Tutorial/TransistorMotorControl)
+
+
+
+
