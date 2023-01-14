@@ -40,6 +40,8 @@ int main() {
             int pm25 = buffer[2] + (buffer[3] << 8);
             int pm10 = buffer[4] + (buffer[5] << 8);
             printf("PM2.5: %d, PM10: %d\n", pm25, pm10);
+            fflush(stdout);
+
         }
     }
 
