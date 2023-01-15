@@ -31,3 +31,24 @@ nohup ./sds011_driver |   while IFS= read -r line; do printf '[%s] %s <br>\n' "$
 sudo rm /var/www/html/index.nginx-debian.html
 sudo  ln -s ~/SDS011-driver/CMakeBuild/output.txt /var/www/html/index.html
 ``` 
+
+```
+sudo apt-get install nginx
+nohup ./sds011_driver |   while IFS= read -r line; do printf '[%s] %s <br>\n' "$(date '+%Y-%m-%d %H:%M:%S')" "$line"; done > output.txt &
+sudo rm /var/www/html/index.nginx-debian.html
+sudo  ln -s ~/SDS011-driver/CMakeBuild/output.txt /var/www/html/index.html
+``` 
+
+
+```
+cd ~/
+scp -P 22 pi@raspberrypi:~/SDS011-driver/CMakeBuild/output.txt ~/
+sed  -n  's/\[\([0-9-]* [0-9:]*\).*/\1/p' output.txt > date_time.txt
+sed  -n 's/.* PM2\.5: \([0-9]*\).*/\1/p' output.txt > PM2.5.txt
+sed  -n 's/.* PM10: \([0-9]*\).*/\1/p' output.txt > PM10.txt
+paste -d","  date_time.txt PM2.5.txt PM10.txt > data_processed.txt
+gnuplot
+set xdata time;set timefmt "%Y-%m-%d %H:%M:%S" ;set format x "%Y-%m-%d %H:%M:%S";
+set datafile separator ','
+plot 'data_processed.txt' using 1:2 with line title "PM2.5" axes x1y1, '' using 1:3 with line title "PM10" axes x1y2;
+``` 
