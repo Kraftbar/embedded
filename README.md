@@ -32,12 +32,6 @@ sudo rm /var/www/html/index.nginx-debian.html
 sudo  ln -s ~/SDS011-driver/CMakeBuild/output.txt /var/www/html/index.html
 ``` 
 
-```
-sudo apt-get install nginx
-nohup ./sds011_driver |   while IFS= read -r line; do printf '[%s] %s <br>\n' "$(date '+%Y-%m-%d %H:%M:%S')" "$line"; done > output.txt &
-sudo rm /var/www/html/index.nginx-debian.html
-sudo  ln -s ~/SDS011-driver/CMakeBuild/output.txt /var/www/html/index.html
-``` 
 
 
 ```
