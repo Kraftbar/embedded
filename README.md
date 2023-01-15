@@ -57,7 +57,9 @@ sed  -n 's/.* PM10: \([0-9]*\).*/\1/p' output.txt > PM10.txt
 paste -d","  date_time.txt PM2.5.txt PM10.txt > data_processed.txt
 gnuplot -persist << EOF
 set xdata time;set timefmt "%Y-%m-%d %H:%M:%S" ;set format x "%Y-%m-%d %H:%M:%S";
+set xtics 3600;
 set datafile separator ','
-plot 'data_processed.txt' using 1:2 with line title "PM2.5" axes x1y1, '' using 1:3 with line title "PM10" axes x1y2;
+set xtics rotate by 90
+plot 'output2.txt' using 1:2 with line title "PM2.5" axes x1y1, '' using 1:3 with line title "PM10" axes x1y2;
 EOF
 ``` 
