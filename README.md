@@ -59,7 +59,8 @@ gnuplot -persist << EOF
 set xdata time;set timefmt "%Y-%m-%d %H:%M:%S" ;set format x "%Y-%m-%d %H:%M:%S";
 set xtics 3600;
 set datafile separator ','
-set xtics rotate by 90
-plot 'output2.txt' using 1:2 with line title "PM2.5" axes x1y1, '' using 1:3 with line title "PM10" axes x1y2;
+set xtics rotate by -30
+set xtics font ", 5"
+plot 'data_processed.txt' using 1:2 with line title "PM2.5" axes x1y1, '' using 1:3 with line title "PM10" axes x1y2;
 EOF
 ``` 
