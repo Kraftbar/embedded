@@ -1,6 +1,6 @@
 # SDS011-driver
 
-all code is written by CHATGPT so far 
+all code is written by CHATGPT/ Copilot so far 
 
 ```
 git clone https://github.com/Kraftbar/SDS011-driver
