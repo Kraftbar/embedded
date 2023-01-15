@@ -1,0 +1,79 @@
+<!-- write a program that parses and plots a file that is in the format of the following: 
+[2023-01-15 22:43:56] PM2.5: 23, PM10: 32 <br>
+[2023-01-15 22:43:57] PM2.5: 23, PM10: 32 <br>
+[2023-01-15 22:43:58] PM2.5: 23, PM10: 32 <br>
+[2023-01-15 22:43:59] PM2.5: 22, PM10: 33 <br>
+[2023-01-15 22:44:00] PM2.5: 22, PM10: 32 <br>
+[2023-01-15 22:44:01] PM2.5: 22, PM10: 32 <br>
+[2023-01-15 22:44:02] PM2.5: 21, PM10: 31 <br>
+The file is stored in the same directory as the index.html file.
+The program should plot the data in the file in a graph.
+The graph should have two lines, one for PM2.5 and one for PM10.
+The x-axis should be the time and the y-axis should be the value.
+The graph should be interactive, so that the user can zoom in and out of the graph.
+The graph should be responsive, so that it fits the screen size of the device.
+The graph should be displayed in the div with id "myDiv".
+-->
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Plotting Data</title>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/moment@2.29.1/moment.min.js"></script>
+
+</head>
+<body>
+<div id="myDiv"></div>
+<script>
+    var data = [];
+    var x = [];
+    var y = [];
+    var y2 = [];
+    var xhttp = new XMLHttpRequest();
+    xhttp.onreadystatechange = function() {
+        if (this.readyState == 4 && this.status == 200) {
+            var lines = this.responseText.split("<br>");
+            for (var i = 0; i < lines.length; i++) {
+                var line = lines[i];
+                var time = line.substring(2,21);
+                var pm25 = line.split(" ")[3];
+                var pm10 = line.split(" ")[5];
+                x.push(time);
+                y.push(pm25);
+                y2.push(pm10);
+            }
+            data.push({
+                x: x,
+                y: y,
+                type: 'scatter',
+                name: 'PM2.5'
+            });
+            data.push({
+                x: x,
+                y: y2,
+                type: 'scatter',
+                name: 'PM10'
+            });
+            var layout = {
+                title: 'PM2.5 and PM10',
+                xaxis: {
+                    type: 'date',
+                tickformat: '%Y-%m-%d %H:%M:%S',
+                range: [moment().subtract(4, 'hours').toDate(), moment().toDate()]
+
+                },
+                yaxis: {
+                    title: 'Value'
+                }
+            };
+            Plotly.newPlot('myDiv', data, layout);
+        }
+    };
+    xhttp.open("GET", "index.html.bk", true);
+    xhttp.send();
+</script>
+
+</html>
+
+
