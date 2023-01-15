@@ -9,7 +9,8 @@ code .
 sudo apt-get install cmake
 mkdir CMakeBuild
 cd CMakeBuild
-cmake .. && make && sudo ./sds011_driver
+cmake .. && make && 
+nohup ./sds011_driver > output.txt &
 ```
 
 ```
@@ -31,8 +32,21 @@ nohup ./sds011_driver |   while IFS= read -r line; do printf '[%s] %s <br>\n' "$
 sudo rm /var/www/html/index.nginx-debian.html
 sudo  ln -s ~/SDS011-driver/CMakeBuild/output.txt /var/www/html/index.html
 ``` 
+```
+sudo tee /etc/logrotate.d/mylogfile <<EOF
+~/SDS011-driver/CMakeBuild/output.txt {
+    size 100M
+    rotate 5
+#    compress
+#    delaycompress
+    missingok
+    notifempty
+    create 0640 root root
+}
+EOF
 
-
+sudo logrotate -d /etc/logrotate.d/mylogfile
+```
 
 ```
 cd ~/
