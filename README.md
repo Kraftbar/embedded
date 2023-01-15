@@ -36,7 +36,7 @@ sudo  ln -s ~/SDS011-driver/CMakeBuild/output.txt /var/www/html/index.html
 
 ```
 cd ~/
-scp -P 22 pi@raspberrypi:~/SDS011-driver/CMakeBuild/output.txt ~/
+scp -P 22 pi@raspberrypi:~/SDS011-driver/CMakeBuild/output.txt ~/output.txt
 sed  -n  's/\[\([0-9-]* [0-9:]*\).*/\1/p' output.txt > date_time.txt
 sed  -n 's/.* PM2\.5: \([0-9]*\).*/\1/p' output.txt > PM2.5.txt
 sed  -n 's/.* PM10: \([0-9]*\).*/\1/p' output.txt > PM10.txt
