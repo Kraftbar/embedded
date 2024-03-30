@@ -1,8 +1,9 @@
 <p float="left">
 <img src="./image227.png" width="250" height="300">
-<img src="./wiring12.png " width="400" height="300">
+<img src="./accel_img.png " width="400" height="300">
 </p>
-
+https://docs.sunfounder.com/projects/raphael-kit/en/latest/python/2.2.9_mpu6050_module_python.html
+http://blog.janlipovsky.cz/2016/03/robocar-arduino-motor-shield-with-raspberry-pi-part2.html
 
 
 
