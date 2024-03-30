@@ -1,5 +1,5 @@
-<img src="./image227.png" width="300" height="300">
-<img src="./wiring12.png " width="300" height="300">
+<img src="./image227.png" width="250" height="300">
+<img src="./wiring12.png " width="250" height="300">
 
 
 
