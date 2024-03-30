@@ -1,6 +1,6 @@
 <p float="left">
 <img src="./image227.png" width="250" height="300">
-<img src="./wiring12.png " width="250" height="300">
+<img src="./wiring12.png " width="400" height="300">
 </p>
 
 
