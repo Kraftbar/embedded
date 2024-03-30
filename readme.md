@@ -1,8 +1,6 @@
-![Alt text](./image227.png =250x250)
-<img src="./image227.png" width="100" height="100">
-<img src="./wiring12.png " width="100" height="100">
+<img src="./image227.png" width="300" height="300">
+<img src="./wiring12.png " width="300" height="300">
 
-![Alt text](./wiring12.png =250x250)
 
 
 
