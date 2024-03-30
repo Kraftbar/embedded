@@ -1,6 +1,6 @@
-![Alt text](./image227.png | width=100)
+![Alt text](./image227.png =250x250)
 
-![Alt text](./wiring12.png | width=100)
+![Alt text](./wiring12.png =250x250)
 
 
 
