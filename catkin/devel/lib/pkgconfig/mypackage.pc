@@ -1,8 +1,0 @@
-prefix=/home/nybo/catkin/devel
-
-Name: mypackage
-Description: Description of mypackage
-Version: 0.9.2
-Cflags: -I/home/nybo/catkin/devel/include
-Libs: -L${prefix}/lib 
-Requires: message_runtime std_msgs

@@ -1,2 +1,0 @@
-mypackage
--DCATKIN_DEVEL_PREFIX=/home/nybo/catkin/devel -DCMAKE_INSTALL_PREFIX=/home/nybo/catkin/install -G Unix Makefiles
