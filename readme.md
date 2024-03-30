@@ -1,5 +1,6 @@
+![Alt text](./image227.png)
 
-![Alt text](./l293d_cirucit_diagram.png)
+![Alt text](./wiring12.png)
 
 
 
