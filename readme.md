@@ -1,3 +1,8 @@
+
+![Alt text](l293d cirucit diagram.png)
+
+
+
 ref. lec 3/4 s.21
 <br>
 
