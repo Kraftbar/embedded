@@ -1,6 +1,6 @@
 # embedded
 
-Microcontroller and hardware projects, consolidated from five repositories.
+Microcontroller and hardware projects, consolidated from seven repositories.
 
 | Folder | Was | What |
 |---|---|---|
@@ -9,6 +9,7 @@ Microcontroller and hardware projects, consolidated from five repositories.
 | `uart-tracer` | `uart-tracer` | Small UART log tracer for local serial debugging |
 | `label-printer` | `auto-print-labels` | Arduino label printer with a serial host tool |
 | `night-alarm` | `esp32-night-alarm` | ESP32 night alarm with waveform playback |
+| `arm-gamepad` | `arm-gamepad` | Gamepad teleop and watchdog for the xArm robot arm (Python) |
 | `rsp-balancing-robot` | `RSP` | Raspberry Pi self-balancing robot: parts lists, ROS/MPU-6050 references, accelerometer and motor data |
 
 History from each source is preserved via `git subtree`. Pre-merge commits are
