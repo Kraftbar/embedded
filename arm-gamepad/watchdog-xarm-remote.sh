@@ -1,10 +1,11 @@
 #!/bin/bash
-# TODO: check if eval is blocking
+# TODO: check if the foreground Python process should block the watchdog
 # TODO:   
 
-command_to_spawn1="python3 ~/arm-gamepad/xarm-remote.py"
+script_dir="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)" || exit 1
+command_to_spawn1="python3 $script_dir/xarm-remote.py"
 function start_xarm() {
-      eval "$command_to_spawn1"
+      python3 "$script_dir/xarm-remote.py"
 }
 function check_xarm_ps_running(){
   nc_pid=$(pgrep -f "$command_to_spawn1")

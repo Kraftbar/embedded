@@ -1,22 +1,46 @@
 # arm-gamepad
 
+This project now lives in `embedded/arm-gamepad`. The former standalone
+`Kraftbar/arm-gamepad` repository has been removed.
+
+## Setup
+
 ```sh
-cd
-git clone https://github.com/Kraftbar/arm-gamepad
-echo "~/arm-gamepad/watchdog-xarm-local.sh &" >> ~/.bashrc
-# Reload the bash profile
-source ~/.bashrc
-cd gamepad
-
-
-cd
-git clone https://github.com/Kraftbar/arm-gamepad
-echo "~/arm-gamepad/watchdog-xarm-remote.sh &" >> ~/.bashrc
-# Reload the bash profile
-source ~/.bashrc
-cd gamepad
-
+mkdir -p ~/github
+git clone https://github.com/Kraftbar/embedded.git ~/github/embedded
+cd ~/github/embedded/arm-gamepad
+go build -o gotest/getstate gotest/getstate.go
+go build -o gotest/setstate gotest/setstate.go
 ```
+
+If you already have `~/github/embedded`, skip the clone. Build the Go helpers on
+the machine that talks to the robot. The local Python script uses NumPy and the
+xArm SDK; the gamepad sender uses `inputs`. Review the robot address in
+`xarm-local.py` and both Go helpers, and the receiver address in `xarm-remote.py`,
+before running them.
+
+On the robot-side machine:
+
+```sh
+bash ~/github/embedded/arm-gamepad/watchdog-xarm-local.sh
+```
+
+On the gamepad-side machine:
+
+```sh
+bash ~/github/embedded/arm-gamepad/watchdog-xarm-remote.sh
+```
+
+The watchdogs find their Python scripts and Go helpers relative to their own
+folder, so the repository can be cloned elsewhere too. Existing shell startup
+entries that launch `~/arm-gamepad/watchdog-xarm-*.sh` must be updated to the
+new location. Replace the old entry rather than adding a second watchdog.
+
+Update with `git -C ~/github/embedded pull --ff-only`; rebuild the Go helpers
+when their source changes.
+
+## Development notes
+
 ```sh
 
 go build -o gotest/getstate gotest/getstate.go && ./gotest/getstate
@@ -29,7 +53,7 @@ go build -o gotest/getstate gotest/getstate.go && ./gotest/getstate
 
 
 
-nohup sh -c "nc -l -u -k 12345 | python3 ~/arm-gamepad/xarm-local.py" &
+nohup sh -c "nc -l -u -k 12345 | python3 ~/github/embedded/arm-gamepad/xarm-local.py" &
 
 nybo@nybo-Latitude-7480:~$ pstree -p  | grep -C10 "sh"
 
@@ -54,8 +78,8 @@ sh      5395 nybo    2w   REG    8,2        0 10356710 /home/nybo/nohup.out
 
 
 # test 
-nohup sh -c "nc -l -u -k 12345 | python3 ~/arm-gamepad/xarm-local.py &>/dev/null" &
-nohup sh -c "nc -l -u -k 12345 | python3 ~/arm-gamepad/xarm-local.py " &>/dev/null &
+nohup sh -c "nc -l -u -k 12345 | python3 ~/github/embedded/arm-gamepad/xarm-local.py &>/dev/null" &
+nohup sh -c "nc -l -u -k 12345 | python3 ~/github/embedded/arm-gamepad/xarm-local.py " &>/dev/null &
 
 pstree -p  | grep -C10 "sh"
 

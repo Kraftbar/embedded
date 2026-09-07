@@ -1,19 +1,27 @@
 # SDS011-driver
 
-all code is written by CHATGPT/ Copilot so far 
+all code is written by CHATGPT/ Copilot so far
+
+This project now lives in `embedded/sds011`. The commands below use
+`~/github/embedded`; skip the clone if that checkout already exists. Existing
+installations under `~/SDS011-driver` need their nginx links and logrotate paths
+updated when moving to this layout. Update the checkout with
+`git -C ~/github/embedded pull --ff-only`.
 
 ```
-git clone https://github.com/Kraftbar/SDS011-driver
-cd SDS011-driver
+mkdir -p ~/github
+git clone https://github.com/Kraftbar/embedded.git ~/github/embedded
+cd ~/github/embedded/sds011
 code . 
 sudo apt-get install cmake
-mkdir CMakeBuild
+mkdir -p CMakeBuild
 cd CMakeBuild
 cmake .. && make 
 # it will be ran later
 ```
 
 ```
+cd ~/github/embedded/sds011
 # plug the usb 
 tmp1=$(ls /dev/) 
 # unplug the usb 
@@ -27,15 +35,16 @@ sed -i "s/ttyUSB0/$tmp4/g" sds011_driver.c
 
 
 ```
+cd ~/github/embedded/sds011/CMakeBuild
 sudo apt-get install nginx
 nohup ./sds011_driver |   while IFS= read -r line; do printf '[%s] %s <br>\n' "$(date '+%Y-%m-%d %H:%M:%S')" "$line"; done > output.txt &
 sudo rm /var/www/html/index.nginx-debian.html
-sudo  ln -s ~/SDS011-driver/CMakeBuild/output.txt /var/www/html/index.html.bk
-sudo ln -s ~/SDS011-driver/index.html /var/www/html/index.html
+sudo  ln -s ~/github/embedded/sds011/CMakeBuild/output.txt /var/www/html/index.html.bk
+sudo ln -s ~/github/embedded/sds011/index.html /var/www/html/index.html
 ``` 
 ```
 sudo tee /etc/logrotate.d/mylogfile <<EOF
-~/SDS011-driver/CMakeBuild/output.txt {
+"$HOME/github/embedded/sds011/CMakeBuild/output.txt" {
     size 100M
     rotate 5
 #    compress
@@ -51,7 +60,7 @@ sudo logrotate -d /etc/logrotate.d/mylogfile
 
 ```
 cd ~/
-scp -P 22 pi@raspberrypi:~/SDS011-driver/CMakeBuild/output.txt ~/output.txt
+scp -P 22 pi@raspberrypi:~/github/embedded/sds011/CMakeBuild/output.txt ~/output.txt
 sed  -n  's/\[\([0-9-]* [0-9:]*\).*/\1/p' output.txt > date_time.txt
 sed  -n 's/.* PM2\.5: \([0-9]*\).*/\1/p' output.txt > PM2.5.txt
 sed  -n 's/.* PM10: \([0-9]*\).*/\1/p' output.txt > PM10.txt

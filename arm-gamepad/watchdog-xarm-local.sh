@@ -2,18 +2,18 @@
 
 # TODO: Handle arm is truned off. 
 # ps -aux | grep -e "xarm" -e "nc -l"
+script_dir="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)" || exit 1
 command_to_spawn1="nc -l -u -k 12345" 
-command_to_spawn2="python3 ~/arm-gamepad/xarm-local.py"
 
 function start_xarm() {
-nohup sh -c " $command_to_spawn1 | $command_to_spawn2 " &>/dev/null &
+nohup sh -c 'nc -l -u -k 12345 | python3 "$1"' sh "$script_dir/xarm-local.py" &>/dev/null &
 }
 function check_xarm_status() {
-  response=$(~/arm-gamepad/gotest/getstate)
+  response=$("$script_dir/gotest/getstate")
   echo "$response"
 }
 function set_xarm_status() {
-  response=$(~/arm-gamepad/gotest/setstate)
+  response=$("$script_dir/gotest/setstate")
   echo "$response"
 }
 function check_xarm_ps_running(){
@@ -63,7 +63,7 @@ done
 # 4: Stop all current motion (restart the system)
 # 0: Enter the motion mode
 
-Get the motion state (GET)
+# Get the motion state (GET)
 # 1:In motion
 # 2:Sleep
 # 3:Suspend
