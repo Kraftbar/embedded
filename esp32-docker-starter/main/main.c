@@ -12,14 +12,14 @@
 #include "wifi.h"
 
 static const char *TAG = "main";
-static TickType_t next_telemetry_tick;
+static TickType_t last_telemetry_tick;
 
 void app_main(void)
 {
     board_init();
     status_init();
     telemetry_init();
-    next_telemetry_tick = xTaskGetTickCount() + pdMS_TO_TICKS(30000);
+    last_telemetry_tick = xTaskGetTickCount();
 
     ESP_LOGI(TAG, "project start");
     ESP_LOGI(TAG, "status LED on GPIO %d", (int) board_status_led_gpio());
@@ -32,7 +32,7 @@ void app_main(void)
         status_poll();
         wifi_poll();
 
-        if (now >= next_telemetry_tick) {
+        if ((TickType_t) (now - last_telemetry_tick) >= pdMS_TO_TICKS(30000)) {
             struct telemetry_snapshot snapshot;
             UBaseType_t stack_hwm_words = uxTaskGetStackHighWaterMark(NULL);
 
@@ -66,7 +66,7 @@ void app_main(void)
                      snapshot.main_stack_hwm_bytes,
                      snapshot.wifi_up ? "yes" : "no");
             telemetry_poll(&snapshot);
-            next_telemetry_tick = now + pdMS_TO_TICKS(30000);
+            last_telemetry_tick = now;
         }
 
         vTaskDelay(pdMS_TO_TICKS(50));

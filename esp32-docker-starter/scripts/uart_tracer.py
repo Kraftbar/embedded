@@ -184,38 +184,37 @@ def main():
     log_file = Path(args.log_file)
     formatter = TextStreamFormatter()
     stop_requested = False
-    ser = None
 
     enable_windows_ansi()
 
     def request_stop(signum, frame):
-        nonlocal stop_requested, ser
+        nonlocal stop_requested
+        # Let the bounded read finish; closing a port inside the signal handler
+        # can invalidate its file descriptor while pyserial is using it.
         stop_requested = True
-        if ser is not None and ser.is_open:
-            try:
-                ser.close()
-            except serial.SerialException:
-                pass
 
     previous_sigint = signal.getsignal(signal.SIGINT)
     signal.signal(signal.SIGINT, request_stop)
 
     try:
         with open(log_file, "w", encoding="utf-8") as log_handle:
-            with serial.Serial(port=None, baudrate=args.baud, timeout=args.timeout) as ser:
-                ser.dtr = False
-                ser.rts = False
-                ser.port = args.port
-                ser.open()
-                print(f"Opened {args.port} @ {args.baud} baud, logging to {log_file}", flush=True)
-                while not stop_requested:
-                    waiting = ser.in_waiting
-                    if not waiting:
-                        time.sleep(0.05)
-                        continue
-                    data = ser.read(waiting)
-                    if data:
-                        emit(formatter.feed(data), log_handle)
+            try:
+                with serial.Serial(port=None, baudrate=args.baud, timeout=args.timeout) as ser:
+                    ser.dtr = False
+                    ser.rts = False
+                    ser.port = args.port
+                    ser.open()
+                    print(f"Opened {args.port} @ {args.baud} baud, logging to {log_file}", flush=True)
+                    while not stop_requested:
+                        waiting = ser.in_waiting
+                        if not waiting:
+                            time.sleep(0.05)
+                            continue
+                        data = ser.read(waiting)
+                        if data:
+                            emit(formatter.feed(data), log_handle)
+            finally:
+                emit(formatter.flush(), log_handle)
     except KeyboardInterrupt:
         pass
     except serial.SerialException as exc:
@@ -224,8 +223,6 @@ def main():
             return 1
     finally:
         signal.signal(signal.SIGINT, previous_sigint)
-        if "log_handle" in locals() and not log_handle.closed:
-            emit(formatter.flush(), log_handle)
 
     return 0
 

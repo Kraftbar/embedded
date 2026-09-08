@@ -1,6 +1,6 @@
 # ESP32 Docker Starter
 
-Minimal ESP-IDF project for a Windows + Docker build workflow.
+ESP-IDF project with Linux build/flash tooling and a Windows + Docker workflow.
 
 ## Known issue first
 
@@ -20,7 +20,7 @@ retrying.
 
 ## Current status
 
-The Linux path is currently the known-good workflow for this project:
+The recovered Linux development notes report the following working on the original machine:
 
 - build on Linux works
 - flash on Linux works
@@ -62,6 +62,18 @@ If you set this project up on another machine, copy `main/wifi_secrets.example.h
 Linux flashing works too, but you need local `ESP-IDF`, `esptool`, and serial
 permissions for `/dev/ttyUSB*` or `/dev/ttyACM*`.
 
+The combined Linux workflow uses an ESP-IDF installation and Python environment:
+
+```bash
+IDF_EXPORT="$HOME/esp-idf/export.sh" \
+ESP32_VENV_BIN="$HOME/.venvs/esp32/bin" \
+bash scripts/build-flash-monitor.sh --port /dev/ttyUSB0
+```
+
+Both paths can be overridden; the defaults above use the current user's home.
+The command builds, then flashes hardware, then starts the monitor. To build
+without flashing, source your ESP-IDF `export.sh` and run `idf.py build`.
+
 After building, flash with:
 
 ```bash
@@ -71,6 +83,10 @@ bash scripts/flash.sh --port /dev/ttyUSB0 --baud 115200
 If you get `Permission denied`, fix group membership first as described above.
 
 ## Telemetry Endpoint
+
+Telemetry is sent to the configured endpoint with the device MAC, local IP, and
+Wi-Fi network identifiers. Review `TELEMETRY_ENDPOINT_URL` in `main/telemetry.c`
+before deploying this firmware to another setup.
 
 The device currently posts telemetry every 30 seconds to:
 
@@ -95,6 +111,7 @@ Current payload fields:
 - `main_stack_hwm_words`
 - `main_stack_hwm_bytes`
 - `wifi_up`
+- `last_post_duration_ms`
 
 Important server requirement:
 
@@ -106,15 +123,15 @@ Important server requirement:
 If the server is slow, the ESP32 logs HTTP timeout failures such as
 `ESP_ERR_HTTP_EAGAIN` even when Wi-Fi and TLS are working correctly.
 
-See [ESP32_ENDPOINT_PROMPT.md](/home/nybo/tmp/ESP32_ENDPOINT_PROMPT.md) for a
+See [ESP32_ENDPOINT_PROMPT.md](ESP32_ENDPOINT_PROMPT.md) for a
 copy-paste endpoint prompt/spec.
 
 ### Known issue: empty POST body (len=0) on server
 
 Diagnosed via `/var/www/twitterclone/esp32-debug.log` on the server.
 Symptoms: TLS handshake succeeds, server receives the POST, but body is empty (`len=0`).
-Root cause: ESP32 HTTP client was reusing stale keep-alive connections. The connection
-appeared open but the body never got transmitted.
+The original development notes attributed this to stale keep-alive connections.
+That diagnosis has not been independently reproduced during recovery.
 
 Fix applied in `main/telemetry.c`:
 
@@ -125,8 +142,8 @@ Fix applied in `main/telemetry.c`:
 This forces a fresh TCP+TLS connection on every POST. Slightly slower per request
 (new handshake each time) but reliable. Do not re-enable keep-alive without testing.
 
-The server-side PHP (`esp32.php`) is correct — `set_post_field` is called before
-`perform`, the issue was purely the stale connection reuse.
+The recovered firmware calls `set_post_field` before `perform`. The endpoint
+implementation and live device behavior still need an integration test.
 
 ## Build
 

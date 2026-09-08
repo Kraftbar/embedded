@@ -22,9 +22,8 @@ while [[ $# -gt 0 ]]; do
 done
 
 PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-VENV_BIN="/home/nybo/.venvs/esp32/bin"
-IDF_EXPORT="/home/nybo/esp-idf/export.sh"
-ELF="$PROJECT_ROOT/build/esp32_docker_starter.elf"
+VENV_BIN="${ESP32_VENV_BIN:-$HOME/.venvs/esp32/bin}"
+IDF_EXPORT="${IDF_EXPORT:-${IDF_PATH:-$HOME/esp-idf}/export.sh}"
 TRACER="$PROJECT_ROOT/scripts/uart_tracer.py"
 
 if [[ ! -f "$IDF_EXPORT" ]]; then

@@ -5,3 +5,4 @@ managed_components/
 main/wifi_secrets.h
 serial.log
 scripts/__pycache__/
+tests/__pycache__/

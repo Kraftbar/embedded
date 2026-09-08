@@ -3,7 +3,9 @@
 #include <assert.h>
 #include <inttypes.h>
 #include <stdio.h>
+#include <string.h>
 
+#include "cJSON.h"
 #include "esp_crt_bundle.h"
 #include "esp_err.h"
 #include "esp_http_client.h"
@@ -12,8 +14,8 @@
 #include "esp_netif.h"
 #include "esp_timer.h"
 #include "esp_wifi.h"
-#include "freertos/queue.h"
 #include "freertos/FreeRTOS.h"
+#include "freertos/queue.h"
 #include "freertos/task.h"
 
 #include "wifi.h"
@@ -28,6 +30,7 @@ static const char *TAG = "telemetry";
 
 static QueueHandle_t telemetry_queue;
 static int64_t s_last_post_duration_ms = -1;
+static portMUX_TYPE s_duration_lock = portMUX_INITIALIZER_UNLOCKED;
 
 static void format_mac_string(char *out, size_t out_size)
 {
@@ -63,15 +66,28 @@ static void format_ip_string(char *out, size_t out_size)
     snprintf(out, out_size, "0.0.0.0");
 }
 
-static void format_wifi_json_fields(char *out, size_t out_size)
+static bool format_wifi_json_fields(char *out, size_t out_size)
 {
     wifi_ap_record_t ap_info;
+    int length;
 
     if (wifi_is_up() && esp_wifi_sta_get_ap_info(&ap_info) == ESP_OK) {
-        snprintf(out,
+        char ssid[sizeof(ap_info.ssid) + 1];
+        memcpy(ssid, ap_info.ssid, sizeof(ap_info.ssid));
+        ssid[sizeof(ap_info.ssid)] = '\0';
+        cJSON *ssid_value = cJSON_CreateString(ssid);
+        if (ssid_value == NULL) {
+            return false;
+        }
+        char *ssid_json = cJSON_PrintUnformatted(ssid_value);
+        cJSON_Delete(ssid_value);
+        if (ssid_json == NULL) {
+            return false;
+        }
+        length = snprintf(out,
                  out_size,
-                 "\"ssid\":\"%s\",\"bssid\":\"%02x:%02x:%02x:%02x:%02x:%02x\",\"rssi\":%d,\"channel\":%u",
-                 (char *) ap_info.ssid,
+                 "\"ssid\":%s,\"bssid\":\"%02x:%02x:%02x:%02x:%02x:%02x\",\"rssi\":%d,\"channel\":%u",
+                 ssid_json,
                  ap_info.bssid[0],
                  ap_info.bssid[1],
                  ap_info.bssid[2],
@@ -80,20 +96,21 @@ static void format_wifi_json_fields(char *out, size_t out_size)
                  ap_info.bssid[5],
                  ap_info.rssi,
                  ap_info.primary);
-        return;
+        cJSON_free(ssid_json);
+    } else {
+        length = snprintf(out, out_size, "\"ssid\":\"\",\"bssid\":\"\",\"rssi\":0,\"channel\":0");
     }
-
-    snprintf(out, out_size, "\"ssid\":\"\",\"bssid\":\"\",\"rssi\":0,\"channel\":0");
+    return length >= 0 && (size_t) length < out_size;
 }
 
 static void telemetry_post(const struct telemetry_snapshot *snapshot)
 {
     esp_http_client_config_t http_cfg;
     esp_http_client_handle_t client;
-    char payload[512];
+    char payload[768];
     char mac[18];
     char ip[16];
-    char wifi_fields[96];
+    char wifi_fields[320];
     int payload_len;
     esp_err_t err;
     int status_code;
@@ -106,7 +123,10 @@ static void telemetry_post(const struct telemetry_snapshot *snapshot)
 
     format_mac_string(mac, sizeof(mac));
     format_ip_string(ip, sizeof(ip));
-    format_wifi_json_fields(wifi_fields, sizeof(wifi_fields));
+    if (!format_wifi_json_fields(wifi_fields, sizeof(wifi_fields))) {
+        ESP_LOGE(TAG, "Wi-Fi field formatting failed");
+        return;
+    }
 
     payload_len = snprintf(payload,
                            sizeof(payload),
@@ -163,7 +183,9 @@ static void telemetry_post(const struct telemetry_snapshot *snapshot)
     start_us = esp_timer_get_time();
     err = esp_http_client_perform(client);
     elapsed_ms = (esp_timer_get_time() - start_us) / 1000;
+    portENTER_CRITICAL(&s_duration_lock);
     s_last_post_duration_ms = elapsed_ms;
+    portEXIT_CRITICAL(&s_duration_lock);
     if (err == ESP_OK) {
         status_code = esp_http_client_get_status_code(client);
         ESP_LOGI(TAG, "posted telemetry: status=%d duration_ms=%" PRIi64, status_code, elapsed_ms);
@@ -192,17 +214,25 @@ void telemetry_init(void)
     telemetry_queue = xQueueCreate(TELEMETRY_QUEUE_LENGTH, sizeof(struct telemetry_snapshot));
     assert(telemetry_queue != NULL);
 
-    xTaskCreate(telemetry_task,
+    BaseType_t created = xTaskCreate(telemetry_task,
                 "telemetry_task",
                 TELEMETRY_TASK_STACK_SIZE,
                 NULL,
                 TELEMETRY_TASK_PRIORITY,
                 NULL);
+    if (created != pdPASS) {
+        vQueueDelete(telemetry_queue);
+        telemetry_queue = NULL;
+        ESP_LOGE(TAG, "failed to create telemetry task");
+    }
 }
 
 int64_t telemetry_last_post_duration_ms(void)
 {
-    return s_last_post_duration_ms;
+    portENTER_CRITICAL(&s_duration_lock);
+    int64_t duration_ms = s_last_post_duration_ms;
+    portEXIT_CRITICAL(&s_duration_lock);
+    return duration_ms;
 }
 
 void telemetry_poll(const struct telemetry_snapshot *snapshot)
