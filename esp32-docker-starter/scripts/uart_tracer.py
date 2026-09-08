@@ -3,6 +3,7 @@
 import argparse
 import ctypes
 import re
+import signal
 import sys
 import time
 from datetime import datetime
@@ -12,6 +13,16 @@ import serial
 
 
 ANSI_ESCAPE_RE = re.compile(r"\x1B\[[0-?]*[ -/]*[@-~]")
+INFO_RE = re.compile(r"^\(\d{2}:\d{2}:\d{2}\.\d{3}\)\sI\s\(")
+WARN_RE = re.compile(r"^\(\d{2}:\d{2}:\d{2}\.\d{3}\)\sW\s\(")
+ERROR_RE = re.compile(r"^\(\d{2}:\d{2}:\d{2}\.\d{3}\)\sE\s\(")
+BOOT_RE = re.compile(r"^\(\d{2}:\d{2}:\d{2}\.\d{3}\)\s(?:ets |rst:|configsip:|clk_drv:|mode:|load:|entry )")
+
+ANSI_RESET = "\x1b[0m"
+ANSI_DIM = "\x1b[2m"
+ANSI_GREEN = "\x1b[32m"
+ANSI_YELLOW = "\x1b[33m"
+ANSI_RED = "\x1b[31m"
 CONTROL_NAMES = {
     0x00: "NUL",
     0x01: "SOH",
@@ -109,6 +120,18 @@ def sanitize_log_text_line(line):
     return ANSI_ESCAPE_RE.sub("", line)
 
 
+def colorize_console_line(line):
+    if ERROR_RE.match(line):
+        return f"{ANSI_RED}{line}{ANSI_RESET}"
+    if WARN_RE.match(line):
+        return f"{ANSI_YELLOW}{line}{ANSI_RESET}"
+    if INFO_RE.match(line):
+        return f"{ANSI_GREEN}{line}{ANSI_RESET}"
+    if BOOT_RE.match(line):
+        return f"{ANSI_DIM}{line}{ANSI_RESET}"
+    return line
+
+
 class TextStreamFormatter:
     def __init__(self):
         self.pending = bytearray()
@@ -143,7 +166,7 @@ class TextStreamFormatter:
 
 def emit(lines, log_handle):
     for line in lines:
-        print(line, flush=True)
+        print(colorize_console_line(line), flush=True)
         print(sanitize_log_text_line(line), file=log_handle, flush=True)
 
 
@@ -160,8 +183,22 @@ def main():
     args = parse_args()
     log_file = Path(args.log_file)
     formatter = TextStreamFormatter()
+    stop_requested = False
+    ser = None
 
     enable_windows_ansi()
+
+    def request_stop(signum, frame):
+        nonlocal stop_requested, ser
+        stop_requested = True
+        if ser is not None and ser.is_open:
+            try:
+                ser.close()
+            except serial.SerialException:
+                pass
+
+    previous_sigint = signal.getsignal(signal.SIGINT)
+    signal.signal(signal.SIGINT, request_stop)
 
     try:
         with open(log_file, "w", encoding="utf-8") as log_handle:
@@ -171,7 +208,7 @@ def main():
                 ser.port = args.port
                 ser.open()
                 print(f"Opened {args.port} @ {args.baud} baud, logging to {log_file}", flush=True)
-                while True:
+                while not stop_requested:
                     waiting = ser.in_waiting
                     if not waiting:
                         time.sleep(0.05)
@@ -182,9 +219,11 @@ def main():
     except KeyboardInterrupt:
         pass
     except serial.SerialException as exc:
-        print(f"Failed to open/read {args.port}: {exc}", flush=True)
-        return 1
+        if not stop_requested:
+            print(f"Failed to open/read {args.port}: {exc}", flush=True)
+            return 1
     finally:
+        signal.signal(signal.SIGINT, previous_sigint)
         if "log_handle" in locals() and not log_handle.closed:
             emit(formatter.flush(), log_handle)
 

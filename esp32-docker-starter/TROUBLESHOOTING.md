@@ -1,5 +1,65 @@
 # Troubleshooting
 
+## Linux: `Permission denied: '/dev/ttyUSB0'`
+
+### Symptom
+
+`scripts/flash.sh` fails immediately with:
+
+```text
+A fatal error occurred: Could not open /dev/ttyUSB0
+[Errno 13] Permission denied: '/dev/ttyUSB0'
+```
+
+The board may still enumerate correctly in `dmesg` or `lsusb`, which makes this
+easy to mistake for a bad board or bad cable.
+
+### What it means
+
+On Linux, USB enumeration and serial-port access are separate things. The kernel
+can detect the ESP32 USB-UART bridge just fine while your current login session
+still lacks permission to open `/dev/ttyUSB0`.
+
+If flashing starts working immediately after `newgrp dialout`, log out / log in,
+or both, that strongly points to a host permission issue rather than a hardware
+fault.
+
+### Fix
+
+Add your user to the common serial groups:
+
+```bash
+sudo usermod -aG dialout $USER
+sudo usermod -aG uucp $USER
+```
+
+Then either:
+
+- log out and back in, or
+- reboot, or
+- start a fresh shell with `newgrp dialout`
+
+After that, verify:
+
+```bash
+groups
+ls -l /dev/ttyUSB0
+```
+
+You should see `dialout` in `groups`, and the device is usually owned by
+`root:dialout`.
+
+### If it still fails
+
+If `groups` already shows `dialout` and you still cannot flash, check whether
+something else has the serial port open:
+
+```bash
+lsof /dev/ttyUSB0
+```
+
+Close any serial monitor before flashing again.
+
 ## "Wrong boot mode detected (0x13)" on Windows
 
 ### Symptom

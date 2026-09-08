@@ -110,11 +110,37 @@ void wifi_init(void)
 void wifi_poll(void)
 {
     TickType_t now = xTaskGetTickCount();
+    wifi_ap_record_t ap_info;
+    esp_netif_ip_info_t ip_info;
+    esp_netif_t *netif;
 
     if (!wifi_up || now < next_log_tick) {
         return;
     }
 
-    ESP_LOGI(TAG, "link up");
+    netif = esp_netif_get_handle_from_ifkey("WIFI_STA_DEF");
+    if (netif != NULL && esp_netif_get_ip_info(netif, &ip_info) == ESP_OK &&
+        esp_wifi_sta_get_ap_info(&ap_info) == ESP_OK) {
+        ESP_LOGI(TAG,
+                 "link up: ssid=%s bssid=%02x:%02x:%02x:%02x:%02x:%02x rssi=%d channel=%u ip=" IPSTR,
+                 (char *) ap_info.ssid,
+                 ap_info.bssid[0],
+                 ap_info.bssid[1],
+                 ap_info.bssid[2],
+                 ap_info.bssid[3],
+                 ap_info.bssid[4],
+                 ap_info.bssid[5],
+                 ap_info.rssi,
+                 ap_info.primary,
+                 IP2STR(&ip_info.ip));
+    } else {
+        ESP_LOGI(TAG, "link up");
+    }
+
     next_log_tick = now + pdMS_TO_TICKS(30000);
+}
+
+bool wifi_is_up(void)
+{
+    return wifi_up;
 }

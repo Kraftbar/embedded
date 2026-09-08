@@ -3,6 +3,7 @@
 # Usage: ./scripts/flash.sh [--port /dev/ttyUSB0] [--baud 115200] [--max-attempts 30]
 
 set -u
+set -o pipefail
 
 PORT="/dev/ttyUSB0"
 BAUD=115200
