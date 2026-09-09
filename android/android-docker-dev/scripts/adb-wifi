@@ -1,0 +1,68 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+DEV_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+COMMAND="${1:-}"
+
+usage() {
+  cat >&2 <<'EOF'
+Usage:
+  adb-wifi pair PHONE_IP:PAIR_PORT PAIR_CODE
+  adb-wifi connect PHONE_IP:PORT
+  adb-wifi devices
+  adb-wifi install /path/to/app-debug.apk
+  adb-wifi shell
+  adb-wifi logcat
+  adb-wifi adb <raw adb args...>
+EOF
+}
+
+run_adb() {
+  docker compose -f "$DEV_DIR/compose.yaml" up -d adb >/dev/null
+  PROJECT_DIR="$DEV_DIR" docker compose -f "$DEV_DIR/compose.yaml" run --rm android adb "$@"
+}
+
+case "$COMMAND" in
+  pair)
+    if [ "${2:-}" = "" ] || [ "${3:-}" = "" ]; then
+      usage
+      exit 1
+    fi
+    run_adb pair "$2" "$3"
+    ;;
+  connect)
+    if [ "${2:-}" = "" ]; then
+      usage
+      exit 1
+    fi
+    run_adb connect "$2"
+    ;;
+  devices)
+    run_adb devices -l
+    ;;
+  install)
+    APK="${2:-}"
+    if [ "$APK" = "" ] || [ ! -f "$APK" ]; then
+      echo "APK file does not exist: ${APK:-<missing>}" >&2
+      exit 1
+    fi
+    APK_DIR="$(cd "$(dirname "$APK")" && pwd)"
+    APK_NAME="$(basename "$APK")"
+    docker compose -f "$DEV_DIR/compose.yaml" up -d adb >/dev/null
+    PROJECT_DIR="$APK_DIR" docker compose -f "$DEV_DIR/compose.yaml" run --rm android adb install -r "/project/$APK_NAME"
+    ;;
+  shell)
+    run_adb shell
+    ;;
+  logcat)
+    run_adb logcat
+    ;;
+  adb)
+    shift
+    run_adb "$@"
+    ;;
+  *)
+    usage
+    exit 1
+    ;;
+esac

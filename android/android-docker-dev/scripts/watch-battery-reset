@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+DEV_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+SERIAL="${1:-}"
+
+if [ "$SERIAL" = "" ]; then
+  echo "Usage: watch-battery-reset SERIAL" >&2
+  exit 1
+fi
+
+"$DEV_DIR/scripts/adb-wifi" adb -s "$SERIAL" shell dumpsys batterystats --reset

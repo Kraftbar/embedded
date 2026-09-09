@@ -1,0 +1,57 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+DEV_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+STATE_FILE="$DEV_DIR/measurements/day-current.env"
+
+usage() {
+  cat >&2 <<'EOF'
+Usage:
+  watch-battery-day-end
+
+Ends the active day test started by watch-battery-day-start, captures a snapshot,
+stops both test apps, and writes a small summary marker.
+EOF
+}
+
+if [ "${1:-}" = "-h" ] || [ "${1:-}" = "--help" ]; then
+  usage
+  exit 0
+fi
+
+if [ ! -f "$STATE_FILE" ]; then
+  echo "No active day test state found: $STATE_FILE" >&2
+  echo "Start one with watch-battery-day-start first." >&2
+  exit 1
+fi
+
+# shellcheck disable=SC1090
+source "$STATE_FILE"
+
+SERIAL="${SERIAL:-}"
+MODE="${MODE:-}"
+PACKAGE="${PACKAGE:-}"
+STARTED_AT="${STARTED_AT:-unknown}"
+
+if [ "$SERIAL" = "" ] || [ "$MODE" = "" ] || [ "$PACKAGE" = "" ]; then
+  echo "State file is incomplete: $STATE_FILE" >&2
+  exit 1
+fi
+
+ENDED_AT="$(date --iso-8601=seconds)"
+DEST="$("$DEV_DIR/scripts/watch-battery-snapshot" "$SERIAL" "$PACKAGE")"
+
+{
+  echo "mode=$MODE"
+  echo "package=$PACKAGE"
+  echo "started_at=$STARTED_AT"
+  echo "ended_at=$ENDED_AT"
+  echo "serial=$SERIAL"
+} > "$DEST/day-summary.txt"
+
+"$DEV_DIR/scripts/adb-wifi" adb -s "$SERIAL" shell am force-stop dev.nybo.helloc || true
+"$DEV_DIR/scripts/adb-wifi" adb -s "$SERIAL" shell am force-stop dev.nybo.hellocpure || true
+
+mv "$STATE_FILE" "$DEST/day-state.env"
+
+echo "$DEST"

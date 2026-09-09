@@ -1,0 +1,33 @@
+services:
+  adb:
+    build:
+      context: .
+    image: android-docker-dev:35-native
+    network_mode: host
+    volumes:
+      - android-cache:/root/.android
+    environment:
+      ADB_VENDOR_KEYS: /root/.android/adbkey
+    command: adb -a -P 5037 server nodaemon
+
+  android:
+    build:
+      context: .
+    image: android-docker-dev:35-native
+    working_dir: /project
+    network_mode: host
+    volumes:
+      - ${PROJECT_DIR:-.}:/project
+      - gradle-cache:/root/.gradle
+      - android-cache:/root/.android
+    environment:
+      GRADLE_USER_HOME: /root/.gradle
+      ANDROID_SDK_ROOT: /opt/android-sdk-linux
+      ANDROID_HOME: /opt/android-sdk-linux
+      ADB_SERVER_SOCKET: tcp:127.0.0.1:5037
+    stdin_open: true
+    tty: true
+
+volumes:
+  gradle-cache:
+  android-cache:

@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+DEV_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+PROJECT_DIR="${1:-$PWD}"
+TASK="${2:-assembleDebug}"
+
+if [ ! -d "$PROJECT_DIR" ]; then
+  echo "Project directory does not exist: $PROJECT_DIR" >&2
+  exit 1
+fi
+
+PROJECT_DIR="$(cd "$PROJECT_DIR" && pwd)"
+
+if [ ! -x "$PROJECT_DIR/gradlew" ]; then
+  echo "No executable gradlew found in: $PROJECT_DIR" >&2
+  echo "Run this from an Android Gradle project, or pass the project path as the first argument." >&2
+  exit 1
+fi
+
+PROJECT_DIR="$PROJECT_DIR" docker compose -f "$DEV_DIR/compose.yaml" run --rm android ./gradlew "$TASK"

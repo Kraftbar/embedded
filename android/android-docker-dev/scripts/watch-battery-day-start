@@ -1,0 +1,67 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+DEV_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+SERIAL="${1:-}"
+MODE="${2:-}"
+STATE_DIR="$DEV_DIR/measurements"
+STATE_FILE="$STATE_DIR/day-current.env"
+
+usage() {
+  cat >&2 <<'EOF'
+Usage:
+  watch-battery-day-start SERIAL MODE
+
+Modes:
+  baseline  stop both test apps, collect no app data
+  pure      run dev.nybo.hellocpure
+  java      run dev.nybo.helloc
+
+Example:
+  watch-battery-day-start 192.168.1.118:33597 pure
+EOF
+}
+
+if [ "$SERIAL" = "" ] || [ "$MODE" = "" ]; then
+  usage
+  exit 1
+fi
+
+case "$MODE" in
+  baseline) PACKAGE="baseline" ;;
+  pure) PACKAGE="dev.nybo.hellocpure" ;;
+  java) PACKAGE="dev.nybo.helloc" ;;
+  *)
+    usage
+    exit 1
+    ;;
+esac
+
+mkdir -p "$STATE_DIR"
+
+adb_cmd() {
+  "$DEV_DIR/scripts/adb-wifi" adb -s "$SERIAL" "$@"
+}
+
+adb_cmd shell am force-stop dev.nybo.helloc || true
+adb_cmd shell am force-stop dev.nybo.hellocpure || true
+adb_cmd shell dumpsys batterystats --reset
+adb_cmd logcat -c || true
+
+STARTED_AT="$(date --iso-8601=seconds)"
+
+if [ "$MODE" = "pure" ]; then
+  adb_cmd shell am start -n dev.nybo.hellocpure/android.app.NativeActivity
+elif [ "$MODE" = "java" ]; then
+  adb_cmd shell am start -n dev.nybo.helloc/.MainActivity
+fi
+
+cat > "$STATE_FILE" <<EOF
+SERIAL=$SERIAL
+MODE=$MODE
+PACKAGE=$PACKAGE
+STARTED_AT=$STARTED_AT
+EOF
+
+echo "Started $MODE test at $STARTED_AT"
+echo "State: $STATE_FILE"

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<WatchFace width="450" height="450" clipShape="CIRCLE">
+    <Scene>
+        <PartImage x="0" y="0" width="450" height="450">
+            <Image resource="cercely_cross_bg" />
+        </PartImage>
+
+        <DigitalClock x="0" y="194" width="450" height="62">
+            <TimeText x="0" y="0" width="450" height="62" format="hh:mm" hourFormat="SYNC_TO_DEVICE" align="CENTER">
+                <Font family="SYNC_TO_DEVICE" size="44" color="#EEEEEE" />
+            </TimeText>
+        </DigitalClock>
+    </Scene>
+</WatchFace>

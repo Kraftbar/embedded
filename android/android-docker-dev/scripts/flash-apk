@@ -1,0 +1,42 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+DEV_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+PHONE="${1:-}"
+PROJECT_DIR="${2:-$PWD}"
+TASK="${3:-assembleDebug}"
+APK="${4:-}"
+
+usage() {
+  cat >&2 <<'EOF'
+Usage:
+  flash-apk PHONE_IP:PORT [project_dir] [gradle_task] [apk_path]
+
+Examples:
+  flash-apk 192.168.1.50:39555
+  flash-apk 192.168.1.50:39555 /path/to/project
+  flash-apk 192.168.1.50:39555 /path/to/project :app:assembleDebug
+EOF
+}
+
+if [ "$PHONE" = "" ]; then
+  usage
+  exit 1
+fi
+
+"$DEV_DIR/scripts/build-apk" "$PROJECT_DIR" "$TASK"
+
+PROJECT_DIR="$(cd "$PROJECT_DIR" && pwd)"
+
+if [ "$APK" = "" ]; then
+  APK="$(find "$PROJECT_DIR" -path '*/build/outputs/apk/debug/*.apk' -type f | sort | head -1)"
+fi
+
+if [ "$APK" = "" ] || [ ! -f "$APK" ]; then
+  echo "Could not find a debug APK under: $PROJECT_DIR" >&2
+  echo "Pass the APK path as the fourth argument." >&2
+  exit 1
+fi
+
+"$DEV_DIR/scripts/adb-wifi" connect "$PHONE"
+"$DEV_DIR/scripts/adb-wifi" install "$APK"

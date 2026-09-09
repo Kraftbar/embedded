@@ -1,0 +1,49 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+DEV_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+SERIAL="${1:-}"
+PACKAGE="${2:-}"
+OUT_DIR="${3:-$DEV_DIR/measurements}"
+
+usage() {
+  cat >&2 <<'EOF'
+Usage:
+  watch-battery-snapshot SERIAL PACKAGE [out_dir]
+
+Examples:
+  watch-battery-snapshot 192.168.1.99:46459 dev.nybo.helloc
+  watch-battery-snapshot 192.168.1.99:46459 dev.nybo.hellocpure
+EOF
+}
+
+if [ "$SERIAL" = "" ] || [ "$PACKAGE" = "" ]; then
+  usage
+  exit 1
+fi
+
+mkdir -p "$OUT_DIR"
+STAMP="$(date +%Y%m%d-%H%M%S)"
+SAFE_PACKAGE="${PACKAGE//[^A-Za-z0-9_.-]/_}"
+DEST="$OUT_DIR/$STAMP-$SAFE_PACKAGE"
+mkdir -p "$DEST"
+
+adb_cmd() {
+  "$DEV_DIR/scripts/adb-wifi" adb -s "$SERIAL" "$@"
+}
+
+adb_cmd shell dumpsys battery > "$DEST/battery.txt" || true
+if [ "$PACKAGE" = "baseline" ]; then
+  adb_cmd shell dumpsys batterystats --charged > "$DEST/batterystats-charged.txt" || true
+else
+  adb_cmd shell dumpsys batterystats --charged "$PACKAGE" > "$DEST/batterystats-charged.txt" || true
+fi
+adb_cmd shell dumpsys batterystats --checkin > "$DEST/batterystats-checkin.csv" || true
+adb_cmd shell dumpsys sensorservice > "$DEST/sensorservice.txt" || true
+if [ "$PACKAGE" != "baseline" ]; then
+  adb_cmd shell pidof "$PACKAGE" > "$DEST/pidof.txt" || true
+  adb_cmd shell dumpsys package "$PACKAGE" > "$DEST/package.txt" || true
+fi
+adb_cmd logcat -d -t 400 > "$DEST/logcat-tail.txt" || true
+
+echo "$DEST"

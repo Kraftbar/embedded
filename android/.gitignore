@@ -1,0 +1,12 @@
+**/build/
+**/.gradle/
+**/.cxx/
+**/local.properties
+**/measurements/
+*.apk
+*.aab
+*.jks
+*.keystore
+*.log
+.codex/
+.claude/
