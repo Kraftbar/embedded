@@ -9,6 +9,8 @@
 var canvas = document.getElementById('drawCanvas');
 var context = canvas.getContext('2d');
 let isDrawing = false;
+let lastX = 0;
+let lastY = 0;
 
 canvas.addEventListener('mousedown', startDrawing);
 canvas.addEventListener('mousemove', draw);
@@ -16,23 +18,36 @@ canvas.addEventListener('mouseup', stopDrawing);
 
 function startDrawing(e) {
     isDrawing = true;
+    lastX = e.offsetX;
+    lastY = e.offsetY;
     draw(e); // This ensures the dot is drawn when you click
 }
 
 function draw(e) {
     if (!isDrawing) return;
+
     var x = e.offsetX;
     var y = e.offsetY;
-    context.fillRect(x, y, 2, 2); // Draw a dot
 
-    // Send the coordinates to localhost
-    fetch('http://192.168.0.52:12355', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ x, y }),
-    }).catch(error => console.log('Error:', error));
+    // Check if the new coordinate is more than 10 pixels away from the last coordinate
+    if (Math.abs(x - lastX) > 10 || Math.abs(y - lastY) > 10) {
+        context.fillRect(x, y, 2, 2); // Draw a dot
+        lastX = x;
+        lastY = y;
+
+        // Adjust coordinates as needed
+        let adjustedX = x - 200;
+        let adjustedY = Math.round(y * 0.75) + 200;
+
+        // Send the coordinates to localhost
+        fetch('http://10.131.29.45:12355', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ x: adjustedX, y: adjustedY }),
+        }).catch(error => console.log('Error:', error));
+    }
 }
 
 function stopDrawing() {
@@ -43,3 +58,4 @@ function stopDrawing() {
 
 </body>
 </html>
+
